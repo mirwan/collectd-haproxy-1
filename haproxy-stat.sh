@@ -6,28 +6,28 @@
 # Us: 
 # LoadPlugin exec
 # <Plugin exec>
-#    Exec "haproxy:haproxy" "/etc/collectd.d/haproxy-stat.sh" "-s" "/var/run/haproxy-stat"
+#    Exec "haproxy:haproxy" "/etc/collectd.d/haproxy-stat.sh" "-s" "tcp-connect:host:port" "-c" "myloadbalancer" 
 # </Plugin>
 #
 # Novembre de 2012
 # Toni Comerma
 
-sock='/var/run/haproxy-stat'
-host="$(hostname -f)"
+sock='unix-client:/var/run/haproxy-stat'
 pause=10
 
-while getopts "h:p:s:" c; do
-    case $c in
+while getopts "h:p:s:" o; do
+    case $o in
          s)      sock=$OPTARG;;
+         c)      hostname=$OPTARG;;
          *)      echo "Usage: $0 [-s <sockfile>]";;
     esac
 done
-host="${COLLECTD_HOSTNAME:-$host}"
+host="${host:-$(hostname -s)}"
 pause="${COLLECTD_INTERVAL:-$pause}"
 INTERVAL=$pause
 while [ $? -eq 0 ]; do
         time="$(date +%s)"
-        echo 'show stat' | socat - UNIX-CLIENT:$sock \
+        echo 'show stat' | socat - $sock \
         |while IFS=',' read pxname svname qcur qmax scur smax slim stot bin bout dreq dresp ereq econ eresp wretr wredis status weight act bck chkfail chdown lastchg downtime qlimit pid iid sid throttle lbtot tracked type rate rate_lim rate_max check_status check_code check_duration hrsp_1xx hrsp_2xx hrsp_3xx hrsp_4xx hrsp_5xx hrsp_other hanafail req_rate req_rate_max req_tot cli_abrt srv_abrt
         do
           if [ "$svname" != "svname" -a ! -z "$svname" ]
