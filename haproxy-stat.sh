@@ -15,7 +15,7 @@
 sock='unix-client:/var/run/haproxy-stat'
 pause=10
 
-while getopts "h:p:s:n:" c; do
+while getopts "h:p:s:l:" c; do
     case $c in
          s)      sock=$OPTARG;;
          l)      lbname=$OPTARG;;
