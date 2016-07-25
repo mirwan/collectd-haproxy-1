@@ -6,7 +6,7 @@
 # Us: 
 # LoadPlugin exec
 # <Plugin exec>
-#    Exec "haproxy:haproxy" "/etc/collectd.d/haproxy-stat.sh" "-s" "tcp-connect:host:port" "-c" "myloadbalancer" 
+#    Exec "haproxy:haproxy" "/etc/collectd.d/haproxy-stat.sh" "-s" "tcp-connect:host:port" "-n" "myloadbalancer" 
 # </Plugin>
 #
 # Novembre de 2012
@@ -15,14 +15,14 @@
 sock='unix-client:/var/run/haproxy-stat'
 pause=10
 
-while getopts "h:p:s:" o; do
-    case $o in
+while getopts "h:p:s:n:" c; do
+    case $c in
          s)      sock=$OPTARG;;
-         c)      hostname=$OPTARG;;
+         l)      lbname=$OPTARG;;
          *)      echo "Usage: $0 [-s <sockfile>]";;
     esac
 done
-host="${host:-$(hostname -s)}"
+host="${lbname:-$(hostname -s)}"
 pause="${COLLECTD_INTERVAL:-$pause}"
 INTERVAL=$pause
 while [ $? -eq 0 ]; do
